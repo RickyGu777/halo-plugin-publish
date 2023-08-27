@@ -9,30 +9,46 @@ spec:
       formSchema:
         - $formkit: text
           name: halourl
-          label: 访问 Halo 的地址
-          value: ""
+          label: 访问 Halo 的地址，如 http://127.0.0.1:8090
+          value: "http://127.0.0.1:8090"
         - $formkit: checkbox
           name: platforms
-          label: 需要同步的平台
+          label: 同步网站
           value: ""
+          help: 请勾选需要同步的网站
           options:
             - label: 博客园
               value: cnblog
+        - $formkit: radio
+          name: alow_metaweblog_access
+          label: 允许 MetaWebLog 客户端访问
+          value: "false"
+          help: 开启后，您可以通过 MetaWebLog 客户端管理 Halo 的文章
+          options:
+            - label: 是
+              value: true
+            - label: 否
+              value: false
+        - $formkit: text
+          name: metaweblog_path
+          label: MetaWebLog 接口地址，如 /xmlrpc
+          value: "/xmlrpc"
     - group: cnblog
       label: 博客园
+      help: 请勾选需要同步的网站
       formSchema:
         - $formkit: text
           name: username
-          label: MetaWeblog登录名
+          label: 登录名
           value: ""
-          help: "前往 https://i.cnblogs.com/settings 设置>其他设置 查看"
+          help: "前往 https://i.cnblogs.com/settings，查看 设置 > 其他设置 MetaWeblog登录名"
         - $formkit: text
           name: password
-          label: MetaWeblog访问令牌
+          label: 访问令牌
           value: ""
-          help: "前往 https://i.cnblogs.com/settings 设置>其他设置 查看"
+          help: "前往 https://i.cnblogs.com/settings，查看 设置 > 其他设置 MetaWeblog访问令牌"
         - $formkit: text
           name: baseurl
-          label: MetaWeblog访问地址
+          label: 访问地址
           value: ""
-          help: "前往 https://i.cnblogs.com/settings 设置>其他设置 查看"
+          help: "前往 https://i.cnblogs.com/settings，查看 设置 > 其他设置 MetaWeblog访问令牌"
