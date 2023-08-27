@@ -1,5 +1,6 @@
-package run.halo.starter;
+package top.leftblue.publish;
 
+import lombok.extern.slf4j.Slf4j;
 import org.pf4j.PluginWrapper;
 import org.springframework.stereotype.Component;
 import run.halo.app.plugin.BasePlugin;
@@ -12,20 +13,21 @@ import run.halo.app.plugin.BasePlugin;
  * @author guqing
  * @since 1.0.0
  */
+@Slf4j
 @Component
-public class StarterPlugin extends BasePlugin {
+public class PublishPlugin extends BasePlugin {
 
-    public StarterPlugin(PluginWrapper wrapper) {
+    public PublishPlugin(PluginWrapper wrapper) {
         super(wrapper);
     }
 
     @Override
     public void start() {
-        System.out.println("插件启动成功！");
+        log.info("插件启动");
     }
 
     @Override
     public void stop() {
-        System.out.println("插件停止！");
+        log.info("插件停止");
     }
 }
