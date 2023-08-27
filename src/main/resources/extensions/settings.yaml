@@ -1,0 +1,38 @@
+apiVersion: v1alpha1
+kind: Setting
+metadata:
+  name: plugin-publish-setting
+spec:
+  forms:
+    - group: basic
+      label: 基础设置
+      formSchema:
+        - $formkit: text
+          name: halourl
+          label: 访问 Halo 的地址
+          value: ""
+        - $formkit: checkbox
+          name: platforms
+          label: 需要同步的平台
+          value: ""
+          options:
+            - label: 博客园
+              value: cnblog
+    - group: cnblog
+      label: 博客园
+      formSchema:
+        - $formkit: text
+          name: username
+          label: MetaWeblog登录名
+          value: ""
+          help: "前往 https://i.cnblogs.com/settings 设置>其他设置 查看"
+        - $formkit: text
+          name: password
+          label: MetaWeblog访问令牌
+          value: ""
+          help: "前往 https://i.cnblogs.com/settings 设置>其他设置 查看"
+        - $formkit: text
+          name: baseurl
+          label: MetaWeblog访问地址
+          value: ""
+          help: "前往 https://i.cnblogs.com/settings 设置>其他设置 查看"
