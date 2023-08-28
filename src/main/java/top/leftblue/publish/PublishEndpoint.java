@@ -25,7 +25,7 @@ public class PublishEndpoint {
                 .and(accept(MediaType.TEXT_XML)), request -> {
                 return request.bodyToMono(String.class)
                     .switchIfEmpty(
-                        Mono.error(new RuntimeException("同步内容为空"))
+                        Mono.error(new RuntimeException("Empty xml content is not allowed"))
                     )
                     .flatMap(metaWebLogService::convertContent)
                     .flatMap(metaWebLogService::publish)

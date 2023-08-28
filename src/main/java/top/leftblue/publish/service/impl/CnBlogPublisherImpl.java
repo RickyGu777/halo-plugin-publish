@@ -10,7 +10,7 @@ import top.leftblue.publish.constant.Platform;
 import top.leftblue.publish.dto.MWACmd;
 import top.leftblue.publish.dto.MWAResult;
 import top.leftblue.publish.http.MeatWeblogApi;
-import top.leftblue.publish.module.MWAPost;
+import top.leftblue.publish.dto.MWAPost;
 import top.leftblue.publish.module.NewPost;
 import top.leftblue.publish.service.Publisher;
 import top.leftblue.publish.util.MapperUtil;

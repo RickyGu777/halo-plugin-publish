@@ -20,6 +20,7 @@ dependencies {
     compileOnly 'run.halo.app:api'
     implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-xml', version: '2.15.2'
     implementation group: 'cn.hutool', name: 'hutool-http', version: '5.8.21'
+    implementation group: 'org.dom4j', name: 'dom4j', version: '2.1.4'
 
     testImplementation 'run.halo.app:api'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

@@ -1,7 +1,9 @@
-package top.leftblue.publish.module;
+package top.leftblue.publish.dto;
 
 import lombok.Data;
 import lombok.experimental.FieldNameConstants;
+import top.leftblue.publish.module.Enclosure;
+import top.leftblue.publish.module.Source;
 
 import java.time.LocalDateTime;
 import java.util.List;

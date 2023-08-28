@@ -3,6 +3,7 @@ package top.leftblue.publish.module;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import top.leftblue.publish.dto.MWACmd;
+import top.leftblue.publish.dto.MWAPost;
 
 import java.util.ArrayList;
 
