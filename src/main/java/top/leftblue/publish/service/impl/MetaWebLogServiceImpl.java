@@ -73,7 +73,7 @@ public class MetaWebLogServiceImpl implements MetaWebLogService {
     }
 
     private void newPost(MWACmd mwaCmd) {
-        NewPost newPost = NewPost.INSTANCE.from(mwaCmd);
+        // NewPost newPost = NewPost.INSTANCE.from(mwaCmd);
     }
 
 

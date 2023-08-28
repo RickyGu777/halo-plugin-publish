@@ -42,3 +42,7 @@ build {
     // build frontend before build
     tasks.getByName('compileJava').dependsOn('buildFrontend')
 }
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}

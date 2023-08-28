@@ -1,17 +1,14 @@
 package top.leftblue.publish.module;
 
+import java.util.ArrayList;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import top.leftblue.publish.dto.MWACmd;
 import top.leftblue.publish.dto.MWAPost;
 
-import java.util.ArrayList;
-
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class NewPost extends ModuleConvertor<NewPost> {
-
-    public static final NewPost INSTANCE = new NewPost();
 
     private String blogid;
     private String username;
@@ -36,7 +33,8 @@ public class NewPost extends ModuleConvertor<NewPost> {
         mwaCmd.getParams().get(3).getValue().getMembers().forEach(member -> {
             switch (member.getStrName()) {
                 case MWAPost.Fields.title -> mwaPost.setTitle(member.getStrValue().getStrValue());
-                case MWAPost.Fields.description -> mwaPost.setDescription(member.getStrValue().getStrValue());
+                case MWAPost.Fields.description ->
+                    mwaPost.setDescription(member.getStrValue().getStrValue());
             }
         });
 
@@ -47,15 +45,27 @@ public class NewPost extends ModuleConvertor<NewPost> {
     public MWACmd toMWARequest() {
         MWACmd mwaCmd = new MWACmd("metaWeblog.newPost", new ArrayList<>(5));
         MWACmd.Param postid =
-                MWACmd.Param.builder().value(MWACmd.Value.builder().strValue("1").build()).build();
-        MWACmd.Param username = MWACmd.Param.builder().value(MWACmd.Value.builder().strValue(this.username).build()).build();
-        MWACmd.Param password = MWACmd.Param.builder().value(MWACmd.Value.builder().strValue(this.password).build()).build();
+            MWACmd.Param.builder().value(MWACmd.Value.builder().strValue("1").build()).build();
+        MWACmd.Param username =
+            MWACmd.Param.builder().value(MWACmd.Value.builder().strValue(this.username).build())
+                .build();
+        MWACmd.Param password =
+            MWACmd.Param.builder().value(MWACmd.Value.builder().strValue(this.password).build())
+                .build();
         MWACmd.Param members =
-                MWACmd.Param.builder().value(MWACmd.Value.builder().members(new ArrayList<>()).build()).build();
-        members.getValue().getMembers().add(MWACmd.Member.builder().strName(MWAPost.Fields.title).strValue(MWACmd.NameValue.builder().strValue(this.mwaPost.getTitle()).build()).build());
-        members.getValue().getMembers().add(MWACmd.Member.builder().strName(MWAPost.Fields.description).strValue(MWACmd.NameValue.builder().strValue(this.mwaPost.getDescription()).build()).build());
+            MWACmd.Param.builder().value(MWACmd.Value.builder().members(new ArrayList<>()).build())
+                .build();
+        members.getValue().getMembers().add(MWACmd.Member.builder().strName(MWAPost.Fields.title)
+            .strValue(MWACmd.NameValue.builder().strValue(this.mwaPost.getTitle()).build())
+            .build());
+        members.getValue().getMembers().add(
+            MWACmd.Member.builder().strName(MWAPost.Fields.description).strValue(
+                    MWACmd.NameValue.builder().strValue(this.mwaPost.getDescription()).build())
+                .build());
         MWACmd.Param publish =
-                MWACmd.Param.builder().value(MWACmd.Value.builder().strValue(String.valueOf(this.publish)).build()).build();
+            MWACmd.Param.builder()
+                .value(MWACmd.Value.builder().strValue(String.valueOf(this.publish)).build())
+                .build();
         mwaCmd.getParams().add(postid);
         mwaCmd.getParams().add(username);
         mwaCmd.getParams().add(password);
