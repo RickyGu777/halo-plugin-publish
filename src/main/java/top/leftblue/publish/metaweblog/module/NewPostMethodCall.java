@@ -32,7 +32,7 @@ public class NewPostMethodCall {
     public static NewPostMethodCall build(Post post, PublishServiceImpl.HeadContent content, MetaWeblogConfig config) {
         MethodPost methodPost = new MethodPost();
         methodPost.setTitle(post.getSpec().getTitle());
-        methodPost.setDescription(content.getRaw());
+        methodPost.setDescription(content.getContent());
 
         MethodContent methodContent = new MethodContent();
         methodContent.setBlogid("null");

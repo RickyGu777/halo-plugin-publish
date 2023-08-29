@@ -32,7 +32,7 @@ public class EditPostMethodCall {
     public static EditPostMethodCall build(Post post, PublishServiceImpl.HeadContent content, MetaWeblogConfig config, String postid){
         MethodPost methodPost = new MethodPost();
         methodPost.setTitle(post.getSpec().getTitle());
-        methodPost.setDescription(content.getRaw());
+        methodPost.setDescription(content.getContent());
 
         MethodContent methodContent = new MethodContent();
         methodContent.setPostid(postid);
