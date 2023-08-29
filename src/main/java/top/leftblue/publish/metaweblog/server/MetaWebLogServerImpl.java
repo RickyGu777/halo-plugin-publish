@@ -1,4 +1,4 @@
-package top.leftblue.publish.service.impl;
+package top.leftblue.publish.metaweblog.server;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
@@ -7,16 +7,14 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 import top.leftblue.publish.constant.MWAConst;
 import top.leftblue.publish.dto.MWACmd;
-import top.leftblue.publish.dto.MWAPost;
-import top.leftblue.publish.module.NewPost;
-import top.leftblue.publish.service.MetaWebLogService;
+import top.leftblue.publish.metaweblog.module.MethodPost;
 
 import java.util.List;
 import java.util.Map;
 
 @RequiredArgsConstructor
 @Component
-public class MetaWebLogServiceImpl implements MetaWebLogService {
+public class MetaWebLogServerImpl implements MetaWebLogServer {
 
     private static final XmlMapper xmlMapper = new XmlMapper();
 
@@ -43,7 +41,7 @@ public class MetaWebLogServiceImpl implements MetaWebLogService {
     }
 
     @Override
-    public String newPost(String blogid, String username, String password, MWAPost post, boolean publish) {
+    public String newPost(String blogid, String username, String password, MethodPost post, boolean publish) {
         return null;
     }
 

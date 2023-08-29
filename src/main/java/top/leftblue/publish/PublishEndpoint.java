@@ -8,7 +8,7 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
-import top.leftblue.publish.service.MetaWebLogService;
+import top.leftblue.publish.metaweblog.server.MetaWebLogServer;
 
 import static org.springframework.web.reactive.function.server.RequestPredicates.POST;
 import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
@@ -17,7 +17,7 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 @AllArgsConstructor
 public class PublishEndpoint {
 
-    private final MetaWebLogService metaWebLogService;
+    private final MetaWebLogServer metaWebLogServer;
 
     @Bean
     RouterFunction<ServerResponse> sitemapRouterFunction() {
@@ -27,8 +27,8 @@ public class PublishEndpoint {
                     .switchIfEmpty(
                         Mono.error(new RuntimeException("Empty xml content is not allowed"))
                     )
-                    .flatMap(metaWebLogService::convertContent)
-                    .flatMap(metaWebLogService::publish)
+                    .flatMap(metaWebLogServer::convertContent)
+                    .flatMap(metaWebLogServer::publish)
                     .then(ServerResponse.ok().contentType(MediaType.TEXT_XML).bodyValue("test"));
             }
         );

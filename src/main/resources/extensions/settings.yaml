@@ -19,20 +19,20 @@ spec:
           options:
             - label: 博客园
               value: cnblog
-        - $formkit: radio
-          name: alow_metaweblog_access
-          label: 允许 MetaWebLog 客户端访问
-          value: "false"
-          help: 开启后，您可以通过 MetaWebLog 客户端管理 Halo 的文章
-          options:
-            - label: 是
-              value: true
-            - label: 否
-              value: false
-        - $formkit: text
-          name: metaweblog_path
-          label: MetaWebLog 接口地址，如 /xmlrpc
-          value: "/xmlrpc"
+#        - $formkit: radio
+#          name: alow_metaweblog_access
+#          label: 允许 MetaWebLog 客户端访问
+#          value: "false"
+#          help: 开启后，您可以通过 MetaWebLog 客户端管理 Halo 的文章
+#          options:
+#            - label: 是
+#              value: true
+#            - label: 否
+#              value: false
+#        - $formkit: text
+#          name: metaweblog_path
+#          label: MetaWebLog 接口地址，如 /xmlrpc
+#          value: "/xmlrpc"
     - group: cnblog
       label: 博客园
       help: 请勾选需要同步的网站

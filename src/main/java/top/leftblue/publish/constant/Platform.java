@@ -2,11 +2,12 @@ package top.leftblue.publish.constant;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import top.leftblue.publish.service.impl.CnBlogPublisherImpl;
+import top.leftblue.publish.service.Publisher;
+import top.leftblue.publish.service.impl.CnBlogPublisher;
 
 @AllArgsConstructor
 public enum Platform {
-    CNBLOG("cnblog", "博客园", CnBlogPublisherImpl.class);
+    CNBLOG("cnblog", "博客园", CnBlogPublisher.class);
 
     @Getter
     private final String name;
@@ -15,9 +16,9 @@ public enum Platform {
     private final String label;
 
     @Getter
-    private final Class<?> handleClz;
+    private final Class<? extends Publisher> handleClz;
 
-    public Platform from(String name) {
+    public static Platform from(String name) {
         for (Platform value : Platform.values()) {
             if (value.getName().equals(name)) {
                 return value;

@@ -1,4 +1,4 @@
-package top.leftblue.publish.module;
+package top.leftblue.publish.metaweblog.module;
 
 import lombok.Data;
 

@@ -8,26 +8,25 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 import run.halo.app.security.AdditionalWebFilter;
-import top.leftblue.publish.service.BlogPublishService;
+import top.leftblue.publish.service.PublishService;
 
 import java.util.List;
 
 @Component
 public class PostHandler implements AdditionalWebFilter {
 
-    private final BlogPublishService blogService;
+    private final PublishService blogService;
 
     private final ServerWebExchangeMatcher matcher =
             ServerWebExchangeMatchers.pathMatchers(HttpMethod.PUT,
                     "/apis/api.console.halo.run/v1alpha1/posts/*/publish");
 
-    public PostHandler(BlogPublishService blogService) {
+    public PostHandler(PublishService blogService) {
         this.blogService = blogService;
     }
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
-        System.out.println(exchange.getRequest().getPath().value());
         return matcher.matches(exchange)
                 .filter(ServerWebExchangeMatcher.MatchResult::isMatch)
                 .switchIfEmpty(chain.filter(exchange).then(Mono.empty()))

@@ -7,14 +7,14 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class BeanUtil implements BeanFactoryAware {
-    private BeanFactory beanFactory;
+    private static BeanFactory beanFactory;
 
     @Override
     public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
-        this.beanFactory = beanFactory;
+        BeanUtil.beanFactory = beanFactory;
     }
 
-    public <T> T getBean(Class<T> clazz) {
+    public static  <T> T getBean(Class<T> clazz) {
         return beanFactory.getBean(clazz);
     }
 

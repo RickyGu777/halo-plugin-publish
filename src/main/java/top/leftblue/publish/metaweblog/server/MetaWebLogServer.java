@@ -1,13 +1,13 @@
-package top.leftblue.publish.service;
+package top.leftblue.publish.metaweblog.server;
 
 import reactor.core.publisher.Mono;
 import top.leftblue.publish.dto.MWACmd;
-import top.leftblue.publish.dto.MWAPost;
+import top.leftblue.publish.metaweblog.module.MethodPost;
 
 import java.util.List;
 import java.util.Map;
 
-public interface MetaWebLogService {
+public interface MetaWebLogServer {
 
     Mono<MWACmd> convertContent(String bodyXml);
 
@@ -33,7 +33,7 @@ public interface MetaWebLogService {
      * @param publish
      * @return
      */
-    String newPost(String blogid, String username, String password, MWAPost post, boolean publish);
+    String newPost(String blogid, String username, String password, MethodPost post, boolean publish);
 
     /**
      * 编辑博客文章：metaWeblog.editPost

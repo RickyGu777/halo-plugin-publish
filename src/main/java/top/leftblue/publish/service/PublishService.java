@@ -1,6 +1,6 @@
 package top.leftblue.publish.service;
 
-public interface BlogPublishService {
+public interface PublishService {
 
     void publish(String postName, String cookie);
 

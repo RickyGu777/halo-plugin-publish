@@ -1,9 +1,7 @@
-package top.leftblue.publish.dto;
+package top.leftblue.publish.metaweblog.module;
 
 import lombok.Data;
 import lombok.experimental.FieldNameConstants;
-import top.leftblue.publish.module.Enclosure;
-import top.leftblue.publish.module.Source;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -11,7 +9,7 @@ import java.util.List;
 
 @Data
 @FieldNameConstants
-public class MWAPost {
+public class MethodPost {
 
     private String title;
     private String description;
