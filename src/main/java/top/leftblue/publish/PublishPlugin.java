@@ -1,8 +1,10 @@
 package top.leftblue.publish;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pf4j.PluginWrapper;
 import org.springframework.stereotype.Component;
+import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.SchemeManager;
 import run.halo.app.plugin.BasePlugin;
 import top.leftblue.publish.module.PublishPost;
@@ -15,15 +17,20 @@ import top.leftblue.publish.module.PublishPost;
 @Component
 public class PublishPlugin extends BasePlugin {
 
-    private SchemeManager schemeManager;
+    private final SchemeManager schemeManager;
+    private final ReactiveExtensionClient client;
+    private final PostWatcher postWatcher;
 
-    public PublishPlugin(SchemeManager schemeManager, PluginWrapper wrapper) {
+    public PublishPlugin(SchemeManager schemeManager, PluginWrapper wrapper, ReactiveExtensionClient client, PostWatcher postWatcher) {
         super(wrapper);
         this.schemeManager = schemeManager;
+        this.client = client;
+        this.postWatcher = postWatcher;
     }
 
     @Override
     public void start() {
+        client.watch(postWatcher);
         schemeManager.register(PublishPost.class);
     }
 

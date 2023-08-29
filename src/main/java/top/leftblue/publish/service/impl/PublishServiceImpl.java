@@ -1,5 +1,6 @@
 package top.leftblue.publish.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpUtil;
@@ -9,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import run.halo.app.core.extension.content.Post;
+import run.halo.app.core.extension.content.Snapshot;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Metadata;
 import top.leftblue.publish.config.BasicConfig;
@@ -33,19 +35,17 @@ public class PublishServiceImpl implements PublishService {
     private final Config config;
 
     @Override
-    public void publish(String postName, String cookie) {
+    public void publish(Snapshot snapshot) {
+        System.out.println("111111 " + snapshot.getSpec().getRawPatch());
+        System.out.println("111111 " + snapshot.getSpec().getContentPatch());
         BasicConfig basicConfig = config.getBasicConfig();
         List<String> platforms = basicConfig.getPlatforms();
-
-        Post post = client.fetch(Post.class, postName).orElse(null);
-        HeadContent content;
-        try {
-            content = getContent(basicConfig.getHalourl(), postName, cookie);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+        if (CollUtil.isEmpty(platforms)) {
+            return;
         }
-        PublishPost publishPost = client.fetch(PublishPost.class, postName).orElse(null);
-        log.debug("publishPost: " + publishPost);
+        String name = snapshot.getMetadata().getName();
+        Post post = client.fetch(Post.class, name).orElse(null);
+        PublishPost publishPost = client.fetch(PublishPost.class, name).orElse(null);
         for (String platformName : platforms) {
             Platform platform = Platform.from(platformName);
             if (platform != null) {
@@ -56,12 +56,12 @@ public class PublishServiceImpl implements PublishService {
                     sitePost = publishPost.getSitePosts().stream().filter(s -> platform.getName().equals(s.getSite())).findAny().orElse(null);
                 }
                 MethodResponse response;
-                if (sitePost == null) {
-                    response = publisher.publish(post, content);
-                    addPublishPost(postName, platformName, response.getResult().getPostid());
-                } else {
-                    response = publisher.edit(post, content, sitePost.getPostid());
-                }
+//                if (sitePost == null) {
+//                    response = publisher.publish(post, content);
+//                    addPublishPost(postName, platformName, response.getResult().getPostid());
+//                } else {
+//                    response = publisher.edit(post, content, sitePost.getPostid());
+//                }
             }
         }
     }
