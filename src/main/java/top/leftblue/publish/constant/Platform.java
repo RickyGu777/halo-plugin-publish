@@ -4,11 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import top.leftblue.publish.service.Publisher;
 import top.leftblue.publish.service.impl.CnBlogPublisher;
+import top.leftblue.publish.service.impl.NonePublisher;
 
 @AllArgsConstructor
 public enum Platform {
-    CNBLOG("cnblog", "博客园", CnBlogPublisher.class);
-
+    CNBLOG("cnblog", "博客园", CnBlogPublisher.class),
+    NONE("none", "空平台", NonePublisher.class),
+    ;
     @Getter
     private final String name;
 
@@ -24,7 +26,7 @@ public enum Platform {
                 return value;
             }
         }
-        return null;
+        return NONE;
     }
 
 }

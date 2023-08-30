@@ -1,6 +1,5 @@
 package top.leftblue.publish;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pf4j.PluginWrapper;
 import org.springframework.stereotype.Component;
@@ -30,8 +29,9 @@ public class PublishPlugin extends BasePlugin {
 
     @Override
     public void start() {
-        client.watch(postWatcher);
+//        client.watch(postWatcher);
         schemeManager.register(PublishPost.class);
+//        HaloPluginManager pluginManager = (HaloPluginManager) wrapper.getPluginManager();
     }
 
     @Override

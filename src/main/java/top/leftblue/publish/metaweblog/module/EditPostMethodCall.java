@@ -2,7 +2,9 @@ package top.leftblue.publish.metaweblog.module;
 
 import lombok.Data;
 import run.halo.app.core.extension.content.Post;
+import run.halo.app.core.extension.content.Snapshot;
 import top.leftblue.publish.config.MetaWeblogConfig;
+import top.leftblue.publish.halo.ContentWrapper;
 import top.leftblue.publish.metaweblog.annotation.MWAElementStruct;
 import top.leftblue.publish.metaweblog.annotation.MWAElementWrapper;
 import top.leftblue.publish.metaweblog.annotation.MWARootElement;
@@ -29,7 +31,7 @@ public class EditPostMethodCall {
 
     }
 
-    public static EditPostMethodCall build(Post post, PublishServiceImpl.HeadContent content, MetaWeblogConfig config, String postid){
+    public static EditPostMethodCall build(Post post, ContentWrapper content, MetaWeblogConfig config, String postid){
         MethodPost methodPost = new MethodPost();
         methodPost.setTitle(post.getSpec().getTitle());
         methodPost.setDescription(content.getContent());

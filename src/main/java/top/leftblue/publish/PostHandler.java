@@ -10,9 +10,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.security.AdditionalWebFilter;
 import top.leftblue.publish.service.PublishService;
 
-import java.util.List;
-
-//@Component
+@Component
 public class PostHandler implements AdditionalWebFilter {
 
     private final PublishService blogService;
@@ -34,11 +32,10 @@ public class PostHandler implements AdditionalWebFilter {
     }
 
     private Mono<Void> render(ServerWebExchange exchange) {
-//        new Thread(() -> {
-//            List<String> cookie = exchange.getRequest().getHeaders().get("Cookie");
-//            String postName = exchange.getRequest().getPath().elements().get(9).value();
-//            blogService.publish(postName, cookie.get(0));
-//        }).start();
+        new Thread(() -> {
+            String postName = exchange.getRequest().getPath().elements().get(9).value();
+            blogService.publish(postName);
+        }).start();
         return Mono.empty();
     }
 

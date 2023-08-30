@@ -13,10 +13,15 @@ repositories {
     maven { url 'https://s01.oss.sonatype.org/content/repositories/releases' }
     maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }
     maven { url 'https://repo.spring.io/milestone' }
+    flatDir {
+        dirs 'libs'
+    }
 }
 
 dependencies {
     implementation platform('run.halo.tools.platform:plugin:2.6.0-SNAPSHOT')
+
+    compileOnly files("libs/application-2.9.0-SNAPSHOT.jar")
     compileOnly 'run.halo.app:api'
     implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-xml', version: '2.15.2'
     implementation group: 'cn.hutool', name: 'hutool-http', version: '5.8.21'
