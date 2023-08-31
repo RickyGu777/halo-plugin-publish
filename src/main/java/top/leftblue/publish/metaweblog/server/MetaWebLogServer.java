@@ -1,17 +1,14 @@
 package top.leftblue.publish.metaweblog.server;
 
 import reactor.core.publisher.Mono;
-import top.leftblue.publish.dto.MWACmd;
-import top.leftblue.publish.metaweblog.module.MethodPost;
+import top.leftblue.publish.metaweblog.module.NewPostMethodCall;
 
 import java.util.List;
 import java.util.Map;
 
 public interface MetaWebLogServer {
 
-    Mono<MWACmd> convertContent(String bodyXml);
-
-    Mono<String> publish(MWACmd mwaCmd);
+    Mono<String> handleMethodCall(String xml);
 
     /**
      * 获取博客信息：blogger.getUsersBlogs
@@ -25,15 +22,8 @@ public interface MetaWebLogServer {
 
     /**
      * 发布博客文章：metaWeblog.newPost
-     *
-     * @param blogid
-     * @param username
-     * @param password
-     * @param post
-     * @param publish
-     * @return
      */
-    String newPost(String blogid, String username, String password, MethodPost post, boolean publish);
+    String newPost(NewPostMethodCall methodCall);
 
     /**
      * 编辑博客文章：metaWeblog.editPost

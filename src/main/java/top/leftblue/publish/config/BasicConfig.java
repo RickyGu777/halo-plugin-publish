@@ -11,4 +11,8 @@ public class BasicConfig {
 
     private List<String> platforms;
 
+    private Boolean allowMetaWeblogAccess;
+
+    private String metaWeblogPath;
+
 }

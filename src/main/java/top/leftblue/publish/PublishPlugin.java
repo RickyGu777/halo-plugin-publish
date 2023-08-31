@@ -31,7 +31,6 @@ public class PublishPlugin extends BasePlugin {
     public void start() {
 //        client.watch(postWatcher);
         schemeManager.register(PublishPost.class);
-//        HaloPluginManager pluginManager = (HaloPluginManager) wrapper.getPluginManager();
     }
 
     @Override

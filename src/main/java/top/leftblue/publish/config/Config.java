@@ -13,6 +13,7 @@ import java.util.Optional;
 public class Config {
 
     private final ReactiveSettingFetcher settingFetcher;
+    private final SettingFetcher fetcher;
 
     public Mono<BasicConfig> getBasicConfig() {
         return settingFetcher.fetch("basic", BasicConfig.class);
@@ -20,6 +21,14 @@ public class Config {
 
     public Mono<MetaWeblogConfig> getMetaWeblogConfig(String group) {
         return settingFetcher.fetch(group, MetaWeblogConfig.class);
+    }
+
+    public Optional<BasicConfig> getBasicConfig2() {
+        return fetcher.fetch("basic", BasicConfig.class);
+    }
+
+    public Optional<MetaWeblogConfig> getMetaWeblogConfig2(String group) {
+        return fetcher.fetch(group, MetaWeblogConfig.class);
     }
 
 }
