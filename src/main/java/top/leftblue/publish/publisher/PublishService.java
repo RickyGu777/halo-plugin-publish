@@ -1,4 +1,4 @@
-package top.leftblue.publish.service;
+package top.leftblue.publish.publisher;
 
 import run.halo.app.core.extension.content.Post;
 

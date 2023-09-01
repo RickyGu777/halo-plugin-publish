@@ -18,7 +18,6 @@ import top.leftblue.publish.util.MapperUtil;
 import javax.crypto.Cipher;
 import java.security.KeyFactory;
 import java.security.PublicKey;
-import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.*;
 
@@ -38,18 +37,7 @@ public class MetaWebLogServerImpl implements MetaWebLogServer {
             MethodCall methodCall = MapperUtil.xml2Bean(xml, MethodCall.class);
             log.debug("halo-plugin-publish: receive method '{}'", methodCall.getMethodName());
             switch (methodCall.getMethodName()) {
-                case MWAConst.newPost -> {
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                newPost(MapperUtil.xml2Bean(xml, NewPostMethodCall.class));
-                            } catch (Exception e) {
-                                throw new RuntimeException(e);
-                            }
-                        }
-                    }).start();
-                }
+                case MWAConst.newPost -> newPost(MapperUtil.xml2Bean(xml, NewPostMethodCall.class));
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -98,7 +86,7 @@ public class MetaWebLogServerImpl implements MetaWebLogServer {
         spec.setPinned(false);
         spec.setPriority(0);
         spec.setPublish(methodCall.getMethodContent().getPublish());
-        spec.setSlug("");
+        spec.setSlug(String.valueOf(System.currentTimeMillis()));
         spec.setTags(List.of());
         spec.setTemplate("");
         spec.setTitle(methodCall.getMethodContent().getMethodPost().getTitle());
@@ -109,18 +97,20 @@ public class MetaWebLogServerImpl implements MetaWebLogServer {
         PostRequest postRequest = new PostRequest(post, content);
 
         log.debug("halo-plugin-publish: start new post");
-        getCookie(methodCall.getMethodContent().getUsername(), methodCall.getMethodContent().getPassword());
-//                .flatMap(cookie -> {
-//                    log.debug("halo-plugin-publish: post draft with cookie '{}'", cookie);
-//                    return haloApi.postDraft(postRequest, cookie)
-//                            .flatMap(postResponse -> {
-//                                if (methodCall.getMethodContent().getPublish()) {
-//                                    log.debug("halo-plugin-publish: publish with cookie '{}'", cookie);
-//                                    return haloApi.publish(postResponse, cookie);
-//                                }
-//                                return Mono.just(postResponse);
-//                            });
-//                }).subscribe();
+        getCookie(methodCall.getMethodContent().getUsername(), methodCall.getMethodContent().getPassword())
+                .ifPresentOrElse(cookie -> {
+                            log.debug("halo-plugin-publish: post draft with cookie '{}'", cookie);
+                            haloApi.postDraft(postRequest, cookie)
+                                    .ifPresent(postResponse -> {
+                                        if (methodCall.getMethodContent().getPublish()) {
+                                            log.debug("halo-plugin-publish: publish with cookie '{}'", cookie);
+                                            haloApi.publish(postResponse, cookie);
+                                        }
+                                    });
+                        },
+                        () -> log.debug("halo-plugin-publish: can not publish with out cookie, no cookie in login result")
+                );
+
         return null;
     }
 

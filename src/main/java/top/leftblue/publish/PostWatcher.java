@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 import run.halo.app.core.extension.Setting;
 import run.halo.app.extension.Extension;
 import run.halo.app.extension.Watcher;
-import top.leftblue.publish.service.PublishService;
+import top.leftblue.publish.publisher.PublishService;
 
 @RequiredArgsConstructor
 @Component

@@ -1,67 +1,68 @@
-package top.leftblue.publish.service.impl;
+package top.leftblue.publish.publisher.impl;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.alibaba.fastjson2.JSONObject;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.Snapshot;
-import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.extension.ExtensionClient;
 import top.leftblue.publish.config.Config;
 import top.leftblue.publish.constant.Platform;
 import top.leftblue.publish.halo.ContentWrapper;
 import top.leftblue.publish.metaweblog.module.MethodResponse;
 import top.leftblue.publish.module.PublishPost;
-import top.leftblue.publish.service.PublishService;
-import top.leftblue.publish.service.Publisher;
+import top.leftblue.publish.publisher.PublishService;
+import top.leftblue.publish.publisher.Publisher;
 import top.leftblue.publish.util.BeanUtil;
-import top.leftblue.publish.util.MapperUtil;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
 @Component
 public class PublishServiceImpl implements PublishService {
 
-    private final ReactiveExtensionClient client;
+    private final ExtensionClient client;
     private final Config config;
 
     @Override
     public void publish(Post post) {
-        client.get(Snapshot.class, post.getSpec().getBaseSnapshot()).flatMap(baseSnapshot -> {
+        client.fetch(Snapshot.class, post.getSpec().getBaseSnapshot()).flatMap(baseSnapshot -> {
             if (StringUtils.equals(post.getSpec().getHeadSnapshot(), post.getSpec().getBaseSnapshot())) {
                 var contentWrapper = ContentWrapper.patchSnapshot(baseSnapshot, baseSnapshot);
-                return Mono.just(contentWrapper);
+                return Optional.of(contentWrapper);
             }
             return client.fetch(Snapshot.class, post.getSpec().getHeadSnapshot())
                     .map(snapshot -> ContentWrapper.patchSnapshot(snapshot, baseSnapshot));
-        }).flatMap(content -> {
+        }).ifPresent(content -> {
             this.publish(post, content);
-            return Mono.empty();
-        }).subscribe();
+        });
     }
 
     @Override
     public void publish(String postName) {
-        client.fetch(Post.class, postName).subscribe(this::publish);
+        client.fetch(Post.class, postName).ifPresent(this::publish);
     }
 
     private void publish(Post post, ContentWrapper content) {
         System.out.println("snapshot: " + content);
-        config.getBasicConfig().flatMap(basicConfig -> client.fetch(PublishPost.class, post.getMetadata().getName())
-                .switchIfEmpty(client.create(PublishPost.newBuild(post.getMetadata().getName())))
-                .flatMap(publishPost -> {
-                    publish(post, content, basicConfig.getPlatforms(), publishPost);
-                    return Mono.empty();
-                })
-        ).subscribe();
+        config.getBasicConfig().flatMap(basicConfig ->
+                client.fetch(PublishPost.class, post.getMetadata().getName())
+                        .or(() -> {
+                            client.create(PublishPost.newBuild(post.getMetadata().getName()));
+                            return client.fetch(PublishPost.class, post.getMetadata().getName());
+                        }).flatMap(publishPost -> {
+                                    MethodResponse response = publish(post, content, basicConfig.getPlatforms(), publishPost);
+                                    return Optional.of(response);
+                                }
+                        ));
     }
 
     private MethodResponse publish(Post post, ContentWrapper content, List<String> platforms, PublishPost publishPost) {
@@ -78,8 +79,8 @@ public class PublishServiceImpl implements PublishService {
                             } else {
                                 log.debug("新增失败");
                             }
-                            return Mono.empty();
-                        }).subscribe();
+                            return Optional.empty();
+                        });
             } else {
                 publisher.edit(post, content, sitePost.getPostid())
                         .flatMap(response -> {
@@ -88,7 +89,7 @@ public class PublishServiceImpl implements PublishService {
                                 log.debug("更新失败，文章不存在，尝试新增文章");
                                 return publisher.publish(post, content);
                             }
-                            return Mono.empty();
+                            return Optional.empty();
                         })
                         .flatMap(response -> {
                             log.debug("新增文章");
@@ -96,12 +97,12 @@ public class PublishServiceImpl implements PublishService {
                                 log.debug("新增成功");
                                 addSitePost(platform, response.getResult().getPostid(), publishPost);
                             }
-                            return Mono.empty();
-                        }).subscribe();
+                            return Optional.empty();
+                        });
 
             }
         }
-        return null;
+        return new MethodResponse();
     }
 
     private void addSitePost(String platformName, String postid, PublishPost publishPost) {
@@ -110,10 +111,10 @@ public class PublishServiceImpl implements PublishService {
         sitePost.setSite(platformName);
         sitePost.setPostid(postid);
         publishPost.getSitePosts().add(sitePost);
-        client.update(publishPost).subscribe();
+        client.update(publishPost);
     }
 
-    private HeadContent getContent(String halourl, String postName, String cookie) throws JsonProcessingException {
+    private HeadContent getContent(String halourl, String postName, String cookie) {
         if (halourl.charAt(halourl.length() - 1) == '/') {
             halourl = halourl.substring(0, halourl.length() - 1);
         }
@@ -121,7 +122,7 @@ public class PublishServiceImpl implements PublishService {
         HttpRequest get = HttpUtil.createGet(path);
         get.header("Cookie", cookie);
         String body = get.execute().sync().body();
-        return MapperUtil.jsonStr2Bean(body, HeadContent.class);
+        return JSONObject.parseObject(body, HeadContent.class);
     }
 
     @Data

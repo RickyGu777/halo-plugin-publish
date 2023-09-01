@@ -1,8 +1,5 @@
 package top.leftblue.publish.util;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
@@ -19,21 +16,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 public class MapperUtil {
-
-    private static final ObjectMapper objectMapper = new ObjectMapper();
-
-    static {
-        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-    }
-
-
-    public static <T> T jsonStr2Bean(String value, Class<T> clz) throws JsonProcessingException {
-        return objectMapper.readValue(value, clz);
-    }
-
-    public static String bean2JsonStr(Object obj) throws JsonProcessingException {
-        return objectMapper.writeValueAsString(obj);
-    }
 
     public static boolean isHtml(String text) {
         try {

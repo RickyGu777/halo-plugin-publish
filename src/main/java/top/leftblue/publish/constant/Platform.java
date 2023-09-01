@@ -2,9 +2,9 @@ package top.leftblue.publish.constant;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import top.leftblue.publish.service.Publisher;
-import top.leftblue.publish.service.impl.CnBlogPublisher;
-import top.leftblue.publish.service.impl.NonePublisher;
+import top.leftblue.publish.publisher.Publisher;
+import top.leftblue.publish.publisher.impl.CnBlogPublisher;
+import top.leftblue.publish.publisher.impl.NonePublisher;
 
 @AllArgsConstructor
 public enum Platform {

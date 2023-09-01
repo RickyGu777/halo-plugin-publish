@@ -2,13 +2,11 @@ package top.leftblue.publish.metaweblog.module;
 
 import lombok.Data;
 import run.halo.app.core.extension.content.Post;
-import run.halo.app.core.extension.content.Snapshot;
 import top.leftblue.publish.config.MetaWeblogConfig;
 import top.leftblue.publish.halo.ContentWrapper;
 import top.leftblue.publish.metaweblog.annotation.MWAElementStruct;
 import top.leftblue.publish.metaweblog.annotation.MWAElementWrapper;
 import top.leftblue.publish.metaweblog.annotation.MWARootElement;
-import top.leftblue.publish.service.impl.PublishServiceImpl;
 
 @Data
 @MWARootElement("methodCall")

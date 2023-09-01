@@ -8,7 +8,7 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 import run.halo.app.security.AdditionalWebFilter;
-import top.leftblue.publish.service.PublishService;
+import top.leftblue.publish.publisher.PublishService;
 
 @Component
 public class PostHandler implements AdditionalWebFilter {
