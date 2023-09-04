@@ -11,6 +11,7 @@ import top.leftblue.publish.halo.LoginRequest;
 import top.leftblue.publish.halo.PostRequest;
 import top.leftblue.publish.http.HaloApi;
 import top.leftblue.publish.metaweblog.MWAConst;
+import top.leftblue.publish.metaweblog.module.EditPostMethodCall;
 import top.leftblue.publish.metaweblog.module.MethodCall;
 import top.leftblue.publish.metaweblog.module.NewPostMethodCall;
 import top.leftblue.publish.util.MapperUtil;
@@ -63,37 +64,8 @@ public class MetaWebLogServerImpl implements MetaWebLogServer {
     @Override
     public String newPost(NewPostMethodCall methodCall) {
         log.debug("halo-plugin-publish: convert methodCall '{}'", methodCall);
-        Post post = new Post();
-        post.setApiVersion("content.halo.run/v1alpha1");
-        post.setKind("Post");
-
-        Metadata metadata = new Metadata();
-        post.setMetadata(metadata);
-        metadata.setName(UUID.randomUUID().toString());
-        metadata.setAnnotations(Map.of("content.halo.run/preferred-editor", "default"));
-
-        Post.PostSpec spec = new Post.PostSpec();
-        post.setSpec(spec);
-        spec.setAllowComment(true);
-        spec.setCategories(List.of());
-        spec.setCover("");
-        spec.setDeleted(false);
-        Post.Excerpt excerpt = new Post.Excerpt();
-        excerpt.setRaw("");
-        excerpt.setAutoGenerate(true);
-        spec.setExcerpt(excerpt);
-        spec.setHtmlMetas(List.of());
-        spec.setPinned(false);
-        spec.setPriority(0);
-        spec.setPublish(methodCall.getMethodContent().getPublish());
-        spec.setSlug(String.valueOf(System.currentTimeMillis()));
-        spec.setTags(List.of());
-        spec.setTemplate("");
-        spec.setTitle(methodCall.getMethodContent().getMethodPost().getTitle());
-        spec.setVisible(Post.VisibleEnum.PUBLIC);
-
+        Post post = methodCall2Post(methodCall);
         PostRequest.Content content = buildContent(methodCall.getMethodContent().getMethodPost().getDescription());
-
         PostRequest postRequest = new PostRequest(post, content);
 
         log.debug("halo-plugin-publish: start new post");
@@ -125,7 +97,7 @@ public class MetaWebLogServerImpl implements MetaWebLogServer {
     }
 
     @Override
-    public boolean editPost(String postid, String username, String password, Map<String, Object> post, boolean publish) {
+    public boolean editPost(EditPostMethodCall methodCall) {
         return false;
     }
 
@@ -170,5 +142,37 @@ public class MetaWebLogServerImpl implements MetaWebLogServer {
                         throw new RuntimeException(e);
                     }
                 });
+    }
+
+    private Post methodCall2Post(NewPostMethodCall methodCall) {
+        Post post = new Post();
+        post.setApiVersion("content.halo.run/v1alpha1");
+        post.setKind("Post");
+
+        Metadata metadata = new Metadata();
+        post.setMetadata(metadata);
+        metadata.setName(UUID.randomUUID().toString());
+        metadata.setAnnotations(Map.of("content.halo.run/preferred-editor", "default"));
+
+        Post.PostSpec spec = new Post.PostSpec();
+        post.setSpec(spec);
+        spec.setAllowComment(true);
+        spec.setCategories(List.of());
+        spec.setCover("");
+        spec.setDeleted(false);
+        Post.Excerpt excerpt = new Post.Excerpt();
+        excerpt.setRaw("");
+        excerpt.setAutoGenerate(true);
+        spec.setExcerpt(excerpt);
+        spec.setHtmlMetas(List.of());
+        spec.setPinned(false);
+        spec.setPriority(0);
+        spec.setPublish(methodCall.getMethodContent().getPublish());
+        spec.setSlug(String.valueOf(System.currentTimeMillis()));
+        spec.setTags(List.of());
+        spec.setTemplate("");
+        spec.setTitle(methodCall.getMethodContent().getMethodPost().getTitle());
+        spec.setVisible(Post.VisibleEnum.PUBLIC);
+        return post;
     }
 }

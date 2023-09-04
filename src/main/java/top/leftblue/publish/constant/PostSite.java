@@ -7,9 +7,9 @@ import top.leftblue.publish.publisher.impl.CnBlogPublisher;
 import top.leftblue.publish.publisher.impl.NonePublisher;
 
 @AllArgsConstructor
-public enum Platform {
+public enum PostSite {
     CNBLOG("cnblog", "博客园", CnBlogPublisher.class),
-    NONE("none", "空平台", NonePublisher.class),
+    NONE("none", "空", NonePublisher.class),
     ;
     @Getter
     private final String name;
@@ -20,8 +20,8 @@ public enum Platform {
     @Getter
     private final Class<? extends Publisher> handleClz;
 
-    public static Platform from(String name) {
-        for (Platform value : Platform.values()) {
+    public static PostSite from(String name) {
+        for (PostSite value : PostSite.values()) {
             if (value.getName().equals(name)) {
                 return value;
             }

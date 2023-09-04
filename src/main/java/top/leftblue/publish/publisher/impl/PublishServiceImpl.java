@@ -1,10 +1,5 @@
 package top.leftblue.publish.publisher.impl;
 
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.http.HttpRequest;
-import cn.hutool.http.HttpUtil;
-import com.alibaba.fastjson2.JSONObject;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -13,7 +8,7 @@ import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.Snapshot;
 import run.halo.app.extension.ExtensionClient;
 import top.leftblue.publish.config.Config;
-import top.leftblue.publish.constant.Platform;
+import top.leftblue.publish.constant.PostSite;
 import top.leftblue.publish.halo.ContentWrapper;
 import top.leftblue.publish.metaweblog.module.MethodResponse;
 import top.leftblue.publish.module.PublishPost;
@@ -34,14 +29,7 @@ public class PublishServiceImpl implements PublishService {
 
     @Override
     public void publish(Post post) {
-        client.fetch(Snapshot.class, post.getSpec().getBaseSnapshot()).flatMap(baseSnapshot -> {
-            if (StringUtils.equals(post.getSpec().getHeadSnapshot(), post.getSpec().getBaseSnapshot())) {
-                var contentWrapper = ContentWrapper.patchSnapshot(baseSnapshot, baseSnapshot);
-                return Optional.of(contentWrapper);
-            }
-            return client.fetch(Snapshot.class, post.getSpec().getHeadSnapshot())
-                    .map(snapshot -> ContentWrapper.patchSnapshot(snapshot, baseSnapshot));
-        }).ifPresent(content -> {
+        wrapContent(post).ifPresent(content -> {
             this.publish(post, content);
         });
     }
@@ -52,85 +40,72 @@ public class PublishServiceImpl implements PublishService {
     }
 
     private void publish(Post post, ContentWrapper content) {
-        System.out.println("snapshot: " + content);
-        config.getBasicConfig().flatMap(basicConfig ->
-                client.fetch(PublishPost.class, post.getMetadata().getName())
-                        .or(() -> {
-                            client.create(PublishPost.newBuild(post.getMetadata().getName()));
-                            return client.fetch(PublishPost.class, post.getMetadata().getName());
-                        }).flatMap(publishPost -> {
-                                    MethodResponse response = publish(post, content, basicConfig.getPlatforms(), publishPost);
-                                    return Optional.of(response);
-                                }
-                        ));
+        config.getBasicConfig().ifPresent(basicConfig ->
+                client.fetch(PublishPost.class, post.getMetadata().getName()).or(() -> {
+                    client.create(PublishPost.newBuild(post.getMetadata().getName()));
+                    return client.fetch(PublishPost.class, post.getMetadata().getName());
+                }).ifPresent(publishPost -> {
+                    publish(post, content, basicConfig.getPlatforms(), publishPost);
+                }));
     }
 
-    private MethodResponse publish(Post post, ContentWrapper content, List<String> platforms, PublishPost publishPost) {
-        for (String platform : platforms) {
-            Publisher publisher = BeanUtil.getBean(Platform.from(platform).getHandleClz());
-            PublishPost.SitePost sitePost = publishPost.getSitePosts().stream().filter(s -> platform.equals(s.getSite())).findAny().orElse(null);
+    private void publish(Post post, ContentWrapper content, List<String> platforms, PublishPost publishPost) {
+        for (String siteName : platforms) {
+            Publisher publisher = BeanUtil.getBean(PostSite.from(siteName).getHandleClz());
+            PublishPost.SitePost sitePost = publishPost.getSitePosts().stream().filter(s -> siteName.equals(s.getSite())).findAny().orElse(null);
             if (sitePost == null) {
-                publisher.publish(post, content)
-                        .flatMap(response -> {
-                            log.debug("新增文章");
-                            if (response.getResult() != null) {
-                                log.debug("新增成功");
-                                addSitePost(platform, response.getResult().getPostid(), publishPost);
-                            } else {
-                                log.debug("新增失败");
-                            }
-                            return Optional.empty();
-                        });
+                addPost(publisher, post, content, publishPost);
             } else {
-                publisher.edit(post, content, sitePost.getPostid())
-                        .flatMap(response -> {
-                            log.debug("更新文章");
-                            if (response.getFault() != null && "1".equals(response.getFault().getFaultCode())) {
-                                log.debug("更新失败，文章不存在，尝试新增文章");
-                                return publisher.publish(post, content);
-                            }
-                            return Optional.empty();
-                        })
-                        .flatMap(response -> {
-                            log.debug("新增文章");
-                            if (response.getResult() != null) {
-                                log.debug("新增成功");
-                                addSitePost(platform, response.getResult().getPostid(), publishPost);
-                            }
-                            return Optional.empty();
-                        });
-
+                editPost(publisher, post, content, sitePost.getPostid(), publishPost);
             }
         }
-        return new MethodResponse();
     }
 
-    private void addSitePost(String platformName, String postid, PublishPost publishPost) {
-        publishPost.getSitePosts().removeIf(p -> p.getSite().equals(platformName));
+    private Optional<MethodResponse> addPost(Publisher publisher, Post post, ContentWrapper content, PublishPost publishPost) {
+        log.debug("halo-plugin-publish: add post '{}'", post.getSpec().getTitle());
+        return publisher.publish(post, content).flatMap(response -> {
+            if (response.isFailed()) {
+                log.debug("halo-plugin-publish: add post failed, code: {}, msg: {}", response.getFault().getFaultCode(), response.getFault().getFaultString());
+            } else {
+                log.debug("halo-plugin-publish: add post succeed");
+                addSitePost(publisher.getSite().getName(), response.getResult().getPostid(), publishPost);
+            }
+            return Optional.of(response);
+        });
+    }
+
+    private Optional<MethodResponse> editPost(Publisher publisher, Post post, ContentWrapper content, String postid, PublishPost publishPost) {
+        log.debug("halo-plugin-publish: edit post '{}'", post.getSpec().getTitle());
+        return publisher.edit(post, content, postid).flatMap(response -> {
+            if (response.isFailed()) {
+                log.debug("halo-plugin-publish: edit post failed, postid: {}, code: {}, msg: {}", postid, response.getFault().getFaultCode(), response.getFault().getFaultString());
+                if ("1".equals(response.getFault().getFaultCode())) {
+                    log.debug("halo-plugin-publish: post not exist, try add");
+                    return addPost(publisher, post, content, publishPost);
+                }
+            } else {
+                log.debug("halo-plugin-publish: edit post succeed");
+            }
+            return Optional.of(response);
+        });
+    }
+
+    private void addSitePost(String siteName, String postid, PublishPost publishPost) {
+        publishPost.getSitePosts().removeIf(p -> p.getSite().equals(siteName));
         PublishPost.SitePost sitePost = new PublishPost.SitePost();
-        sitePost.setSite(platformName);
+        sitePost.setSite(siteName);
         sitePost.setPostid(postid);
         publishPost.getSitePosts().add(sitePost);
         client.update(publishPost);
     }
 
-    private HeadContent getContent(String halourl, String postName, String cookie) {
-        if (halourl.charAt(halourl.length() - 1) == '/') {
-            halourl = halourl.substring(0, halourl.length() - 1);
-        }
-        String path = StrUtil.format("{}/apis/api.console.halo.run/v1alpha1/posts/{}/head-content", halourl, postName);
-        HttpRequest get = HttpUtil.createGet(path);
-        get.header("Cookie", cookie);
-        String body = get.execute().sync().body();
-        return JSONObject.parseObject(body, HeadContent.class);
+    private Optional<ContentWrapper> wrapContent(Post post) {
+        return client.fetch(Snapshot.class, post.getSpec().getBaseSnapshot()).flatMap(baseSnapshot -> {
+            if (StringUtils.equals(post.getSpec().getHeadSnapshot(), post.getSpec().getBaseSnapshot())) {
+                var contentWrapper = ContentWrapper.patchSnapshot(baseSnapshot, baseSnapshot);
+                return Optional.of(contentWrapper);
+            }
+            return client.fetch(Snapshot.class, post.getSpec().getHeadSnapshot()).map(snapshot -> ContentWrapper.patchSnapshot(snapshot, baseSnapshot));
+        });
     }
-
-    @Data
-    public static class HeadContent {
-        private String content;
-        private String raw;
-        private String rawType;
-        private String snapshotName;
-    }
-
 }

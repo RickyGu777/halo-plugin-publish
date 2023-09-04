@@ -38,4 +38,8 @@ public class MethodResponse {
         private String faultString;
     }
 
+    public boolean isFailed(){
+        return this.fault != null && this.fault.getFaultCode() != null;
+    }
+
 }

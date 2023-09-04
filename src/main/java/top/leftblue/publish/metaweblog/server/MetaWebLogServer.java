@@ -1,6 +1,7 @@
 package top.leftblue.publish.metaweblog.server;
 
 import reactor.core.publisher.Mono;
+import top.leftblue.publish.metaweblog.module.EditPostMethodCall;
 import top.leftblue.publish.metaweblog.module.NewPostMethodCall;
 
 import java.util.List;
@@ -27,15 +28,8 @@ public interface MetaWebLogServer {
 
     /**
      * 编辑博客文章：metaWeblog.editPost
-     *
-     * @param postid
-     * @param username
-     * @param password
-     * @param post
-     * @param publish
-     * @return
      */
-    boolean editPost(String postid, String username, String password, Map<String, Object> post, boolean publish);
+    boolean editPost(EditPostMethodCall methodCall);
 
     /**
      * 获取博客文章：metaWeblog.getPost

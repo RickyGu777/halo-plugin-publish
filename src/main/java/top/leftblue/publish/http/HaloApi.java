@@ -10,8 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import run.halo.app.core.extension.content.Post;
-import run.halo.app.plugin.SettingFetcher;
-import top.leftblue.publish.config.BasicConfig;
 import top.leftblue.publish.config.Config;
 import top.leftblue.publish.halo.LoginRequest;
 import top.leftblue.publish.halo.PostRequest;
@@ -25,12 +23,11 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Component
 public class HaloApi {
-
-    private final SettingFetcher settingFetcher;
+    
     private final Config config;
 
     public Optional<Post> postDraft(PostRequest postRequest, String cookie) {
-        return settingFetcher.fetch("basic", BasicConfig.class)
+        return config.getBasicConfig()
                 .flatMap(basicConfig -> {
                     String newPostUrl = basicConfig.getHalourl() + HaloApiPath.newPost;
                     HttpRequest request = HttpUtil.createRequest(Method.POST, newPostUrl);
@@ -44,7 +41,7 @@ public class HaloApi {
     }
 
     public Optional<Boolean> publish(Post post, String cookie) {
-        return settingFetcher.fetch("basic", BasicConfig.class)
+        return config.getBasicConfig()
                 .flatMap(basicConfig -> {
                     String publishUrl = StrUtil.format(basicConfig.getHalourl() + HaloApiPath.publish, post.getMetadata().getName());
                     HttpRequest request = HttpUtil.createRequest(Method.PUT, publishUrl);

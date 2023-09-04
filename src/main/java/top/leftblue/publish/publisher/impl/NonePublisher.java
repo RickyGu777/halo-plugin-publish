@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Post;
+import top.leftblue.publish.constant.PostSite;
 import top.leftblue.publish.halo.ContentWrapper;
 import top.leftblue.publish.metaweblog.module.MethodResponse;
 import top.leftblue.publish.publisher.Publisher;
@@ -13,6 +14,11 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Component
 public class NonePublisher implements Publisher {
+
+    @Override
+    public PostSite getSite() {
+        return PostSite.NONE;
+    }
 
     @Override
     public Optional<MethodResponse> publish(Post post, ContentWrapper content) {
