@@ -1,13 +1,19 @@
 package top.leftblue.publish.metaweblog.server;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
+import top.leftblue.publish.metaweblog.MWAConst;
 import top.leftblue.publish.metaweblog.module.EditPostMethodCall;
 import top.leftblue.publish.metaweblog.module.NewPostMethodCall;
+import top.leftblue.publish.util.MapperUtil;
 
 import java.util.List;
 import java.util.Map;
 
 public interface MetaWebLogServer {
+
+    Logger log = LoggerFactory.getLogger(MetaWebLogServer.class);
 
     Mono<String> handleMethodCall(String xml);
 
@@ -29,7 +35,7 @@ public interface MetaWebLogServer {
     /**
      * 编辑博客文章：metaWeblog.editPost
      */
-    boolean editPost(EditPostMethodCall methodCall);
+    String editPost(EditPostMethodCall methodCall);
 
     /**
      * 获取博客文章：metaWeblog.getPost
@@ -72,4 +78,13 @@ public interface MetaWebLogServer {
      * @return
      */
     Map<String, String> newMediaObject(String blogid, String username, String password, Map<String, Object> post);
+
+    default String toResultText(Object obj) {
+        try {
+            return MapperUtil.bean2Xml(obj);
+        } catch (Exception e) {
+            log.error("halo-plugin-publish: failed cast MethodResponse to string, {}", e.getMessage());
+            return MWAConst.INTERNAL_ERROR;
+        }
+    }
 }

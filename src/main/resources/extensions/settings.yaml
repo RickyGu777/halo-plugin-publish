@@ -23,7 +23,7 @@ spec:
           name: allowMetaWeblogAccess
           label: 允许 MetaWebLog 客户端访问
           value: "false"
-          help: 开启后可以通过 MetaWeblog 客户端管理 Halo 的文章
+          help: 开启后可以通过 MetaWeblog 客户端管理 Halo 的文章，暂时只支持 newPost 和 editPost
           options:
             - label: 是
               value: true

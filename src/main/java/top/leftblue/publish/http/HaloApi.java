@@ -23,13 +23,41 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Component
 public class HaloApi {
-    
+
+    interface ApiPath {
+
+        String newPost = "/apis/api.console.halo.run/v1alpha1/posts";
+
+        String publish = "/apis/api.console.halo.run/v1alpha1/posts/{}/publish";
+
+        String updateContent = "/apis/api.console.halo.run/v1alpha1/posts/{}/content";
+
+        String publicKey = "/login/public-key";
+
+        String login = "/login";
+
+    }
+
     private final Config config;
+
+    public Optional<Post> updateContent(PostRequest.Content content, String postid, String cookie) {
+        return config.getBasicConfig()
+                .flatMap(basicConfig -> {
+                    String updateContentUrl = basicConfig.getHalourl() + StrUtil.format(ApiPath.updateContent, postid);
+                    HttpRequest request = HttpUtil.createRequest(Method.PUT, updateContentUrl);
+                    request.cookie(cookie);
+                    request.body(JSONObject.toJSONString(content));
+                    HttpResponse response = request.execute();
+                    Optional<Post> post = Optional.of(JSONObject.parseObject(response.body(), Post.class));
+                    response.close();
+                    return post;
+                });
+    }
 
     public Optional<Post> postDraft(PostRequest postRequest, String cookie) {
         return config.getBasicConfig()
                 .flatMap(basicConfig -> {
-                    String newPostUrl = basicConfig.getHalourl() + HaloApiPath.newPost;
+                    String newPostUrl = basicConfig.getHalourl() + ApiPath.newPost;
                     HttpRequest request = HttpUtil.createRequest(Method.POST, newPostUrl);
                     request.cookie(cookie);
                     request.body(JSONObject.toJSONString(postRequest));
@@ -43,7 +71,7 @@ public class HaloApi {
     public Optional<Boolean> publish(Post post, String cookie) {
         return config.getBasicConfig()
                 .flatMap(basicConfig -> {
-                    String publishUrl = StrUtil.format(basicConfig.getHalourl() + HaloApiPath.publish, post.getMetadata().getName());
+                    String publishUrl = StrUtil.format(basicConfig.getHalourl() + ApiPath.publish, post.getMetadata().getName());
                     HttpRequest request = HttpUtil.createRequest(Method.PUT, publishUrl);
                     request.setReadTimeout(3000);
                     request.cookie(cookie);
@@ -55,7 +83,7 @@ public class HaloApi {
 
     public Optional<PublicKey> getPublicKey() {
         return config.getBasicConfig().flatMap(basicConfig -> {
-            String publicKeyUrl = basicConfig.getHalourl() + HaloApiPath.publicKey;
+            String publicKeyUrl = basicConfig.getHalourl() + ApiPath.publicKey;
             HttpRequest request = HttpUtil.createRequest(Method.GET, publicKeyUrl);
             request.setReadTimeout(3000);
             HttpResponse response = request.execute();
@@ -68,7 +96,7 @@ public class HaloApi {
     public Optional<String> getCookie(LoginRequest loginRequest) {
         return config.getBasicConfig()
                 .flatMap(basicConfig -> {
-                    String loginUrl = basicConfig.getHalourl() + HaloApiPath.login;
+                    String loginUrl = basicConfig.getHalourl() + ApiPath.login;
                     HttpResponse response;
                     HttpRequest request = HttpUtil.createRequest(Method.POST, loginUrl);
                     Map<String, String> form = new HashMap<>();

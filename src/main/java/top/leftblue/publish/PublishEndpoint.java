@@ -28,7 +28,7 @@ public class PublishEndpoint {
     private final SettingFetcher settingFetcher;
 
     @Bean
-    RouterFunction<ServerResponse> sitemapRouterFunction() {
+    RouterFunction<ServerResponse> xmlrpcRouterFunction() {
         Optional<BasicConfig> basic = settingFetcher.fetch("basic", BasicConfig.class);
         if (basic.isEmpty()) {
             return null;
@@ -39,13 +39,9 @@ public class PublishEndpoint {
         log.debug("halo-plugin-publish: Start MetaWeblog service");
         String path = StringUtils.isBlank(basic.get().getMetaWeblogPath()) ? "/xmlrpc" :
                 basic.get().getMetaWeblogPath();
-        log.debug("halo-plugin-publish: service path is '{}'", path);
+        log.debug("halo-plugin-publish: MetaWeblog service path: '{}'", path);
         return RouterFunctions.route(POST(path).and(accept(MediaType.TEXT_XML)), request -> {
             return request.bodyToMono(String.class)
-                    .flatMap(s -> {
-                        log.debug("halo-plugin-publish: receive body '{}'", s);
-                        return Mono.just(s);
-                    })
                     .switchIfEmpty(Mono.error(new RuntimeException("Empty xml content is not allowed")))
                     .flatMap(metaWebLogServer::handleMethodCall)
                     .flatMap(response -> ServerResponse.ok().contentType(MediaType.TEXT_XML).bodyValue(response));

@@ -17,7 +17,7 @@ import java.util.List;
 
 public class MapperUtil {
 
-    public static boolean isHtml(String text) {
+    public static boolean isXml(String text) {
         try {
             DocumentHelper.parseText(text);
             return true;
@@ -116,7 +116,7 @@ public class MapperUtil {
         return rootElement.getDocument().asXML();
     }
 
-    private static void bean2Element(Element element, Object obj, boolean isStruct) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException, InstantiationException {
+    private static void bean2Element(Element element, Object obj, boolean isStruct) throws IllegalAccessException {
         Class<?> clz = obj.getClass();
         Field[] fields = clz.getDeclaredFields();
         for (Field field : fields) {
